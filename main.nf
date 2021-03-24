@@ -1546,6 +1546,7 @@ process IVAR_VARIANTS {
     path "${sample}.bcftools_stats.txt"
     path "${sample}.tsv"
     path "*.log"
+    set val(sample), path("${sample}.modified.tsv") into ch_modified_ivar
 
     script:
     features = params.gff ? "-g $gff" : ""
@@ -1553,16 +1554,19 @@ process IVAR_VARIANTS {
     """
     cat $mpileup | ivar variants -q $params.min_base_qual -t $params.min_allele_freq -m $params.min_coverage -r $fasta $features -p $sample
 
-    ivar_variants_to_vcf.py ${sample}.tsv ${sample}.vcf > ${sample}.variant.counts.log
-    bgzip -c ${sample}.vcf > ${sample}.vcf.gz
-    tabix -p vcf -f ${sample}.vcf.gz
-    bcftools stats ${sample}.vcf.gz > ${sample}.bcftools_stats.txt
-    cat $header ${sample}.variant.counts.log > ${sample}.variant.counts_mqc.tsv
+    #ivar_variants_to_vcf.py ${sample}.tsv ${sample}.vcf > ${sample}.variant.counts.log
+    #bgzip -c ${sample}.vcf > ${sample}.vcf.gz
+    #tabix -p vcf -f ${sample}.vcf.gz
+    #bcftools stats ${sample}.vcf.gz > ${sample}.bcftools_stats.txt
+    #cat $header ${sample}.variant.counts.log > ${sample}.variant.counts_mqc.tsv
 
     ivar_variants_to_vcf.py ${sample}.tsv ${prefix}.vcf --pass_only --allele_freq_thresh $params.max_allele_freq > ${prefix}.variant.counts.log
     bgzip -c ${prefix}.vcf > ${prefix}.vcf.gz
     tabix -p vcf -f ${prefix}.vcf.gz
     bcftools stats ${prefix}.vcf.gz > ${prefix}.bcftools_stats.txt
+
+    ivar_variants_to_vcf_modified.py ${sample}.tsv ${sample}.modified_pass.vcf --pass_only > ${sample}.modified_variant.counts.pass.log
+    cut -f11,12,13 ${sample}.modified_pass.vcf | sed '1,13d' > ${sample}.modified.tsv
     """
 }
 
@@ -1615,12 +1619,14 @@ process IVAR_SNPEFF {
     input:
     tuple val(sample), val(single_end), path(highfreq_vcf), path(lowfreq_vcf) from ch_ivar_highfreq_snpeff.join(ch_ivar_lowfreq_snpeff, by: [0,1])
     tuple file(db), file(config) from ch_snpeff_db_ivar
+    set val(sample), path(tsv) from ch_modified_ivar
 
     output:
     path "${prefix}.snpEff.csv" into ch_ivar_snpeff_highfreq_mqc
     path "${sample}.snpEff.csv"
     path "*.vcf.gz*"
     path "*.{txt,html}"
+    set val(sample), path("${sample}.snpSift.table.modified.txt")
 
     script:
     prefix = "${sample}.AF${params.max_allele_freq}"
@@ -1670,6 +1676,8 @@ process IVAR_SNPEFF {
         "ANN[*].AA_LEN" "ANN[*].DISTANCE" "EFF[*].EFFECT" \\
         "EFF[*].FUNCLASS" "EFF[*].CODON" "EFF[*].AA" "EFF[*].AA_LEN" \\
         > ${prefix}.snpSift.table.txt
+
+        paste -d'\t' ${sample}.snpSift.table.txt ${sample}.modified.tsv > ${sample}.snpSift.table.modified.txt
    	"""
 }
 
