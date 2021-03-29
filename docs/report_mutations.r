@@ -1,7 +1,7 @@
 vcffile <- paste("mutations/", sample, ".snpSift.table.modified.txt", sep= "")
 mutations_df <- read.table(vcffile, sep = "\t", header = T)
 ref_alt_nuc <- mutations_df[,4]
-mutations_db <- read.table(mutations_tsv, header = F, sep = "\t")
+
 mutations_column <- as.character(mutations_db$V1)
 mutations_df$EFF....AA = gsub("\\.", "",mutations_df$EFF....AA)
 mutations_df$EFF....AA = gsub(",", "",mutations_df$EFF....AA)
