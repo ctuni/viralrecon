@@ -1554,11 +1554,11 @@ process IVAR_VARIANTS {
     """
     cat $mpileup | ivar variants -q $params.min_base_qual -t $params.min_allele_freq -m $params.min_coverage -r $fasta $features -p $sample
 
-    #ivar_variants_to_vcf.py ${sample}.tsv ${sample}.vcf > ${sample}.variant.counts.log
-    #bgzip -c ${sample}.vcf > ${sample}.vcf.gz
-    #tabix -p vcf -f ${sample}.vcf.gz
-    #bcftools stats ${sample}.vcf.gz > ${sample}.bcftools_stats.txt
-    #cat $header ${sample}.variant.counts.log > ${sample}.variant.counts_mqc.tsv
+    ivar_variants_to_vcf.py ${sample}.tsv ${sample}.vcf > ${sample}.variant.counts.log
+    bgzip -c ${sample}.vcf > ${sample}.vcf.gz
+    tabix -p vcf -f ${sample}.vcf.gz
+    bcftools stats ${sample}.vcf.gz > ${sample}.bcftools_stats.txt
+    cat $header ${sample}.variant.counts.log > ${sample}.variant.counts_mqc.tsv
 
     ivar_variants_to_vcf.py ${sample}.tsv ${prefix}.vcf --pass_only --allele_freq_thresh $params.max_allele_freq > ${prefix}.variant.counts.log
     bgzip -c ${prefix}.vcf > ${prefix}.vcf.gz
