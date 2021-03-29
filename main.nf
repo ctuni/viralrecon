@@ -1562,7 +1562,7 @@ process IVAR_VARIANTS {
     cat $header ${sample}.variant.counts.log > ${sample}.variant.counts_mqc.tsv
 
     ivar_variants_to_vcf_modified.py ${sample}.tsv ${sample}.modified.vcf > ${sample}.modified_variant.counts.pass.log
-    cut -f11,12,13 ${sample}.modified.vcf | sed '1,13d' > ${sample}.modified.tsv
+    cut -f2,11,12,13 ${sample}.modified.vcf | sed '1,13d' > ${sample}.modified.tsv
 
     ivar_variants_to_vcf.py ${sample}.tsv ${prefix}.vcf --pass_only --allele_freq_thresh $params.max_allele_freq > ${prefix}.variant.counts.log
     bgzip -c ${prefix}.vcf > ${prefix}.vcf.gz
@@ -1570,7 +1570,7 @@ process IVAR_VARIANTS {
     bcftools stats ${prefix}.vcf.gz > ${prefix}.bcftools_stats.txt
 
     ivar_variants_to_vcf_modified.py ${sample}.tsv ${prefix}.modified_pass.vcf --pass_only --allele_freq_thresh $params.max_allele_freq > ${prefix}.modified_variant.counts.pass.log
-    cut -f11,12,13 ${prefix}.modified_pass.vcf | sed '1,13d' > ${prefix}.modified.tsv
+    cut -f2,11,12,13 ${prefix}.modified_pass.vcf | sed '1,13d' > ${prefix}.modified.tsv
 
     """
 }
