@@ -1,3 +1,6 @@
+library(Biostrings)
+library(stringi)
+
 vcffile <- paste("mutations/", sample, ".snpSift.table.modified.txt", sep= "")
 mutations_df <- read.table(vcffile, sep = "\t", header = T)
 ref_alt_nuc <- mutations_df[,4]
