@@ -41,7 +41,7 @@ i=1
 codon=""
 no_changes=0
 changed_aa=""
-for (i in 1:length(sample_mutations)) {
+for (i in 1:length(sample_mutations)-1) {
   if(sub_sample_mutations[i]=="ami"){
     no_changes=no_changes+1
   } else {
